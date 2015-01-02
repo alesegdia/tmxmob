@@ -43,11 +43,17 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 	// MAP
 	private TiledMap map;
 	private TiledMapRenderer renderer;
+
+	private OrthographicCamera mapCamera;
+	FitViewport mapViewport;
+
 	private OrthographicCamera camera;
+	
 	private AssetManager assetManager;
 	
 	// TILE PALETTE
 	Array<TextureRegion> editsprites = new Array<TextureRegion>();
+	//Array<Sprite> editsprites = new Array<Sprite>();
 	Array<TiledMapTile> edittiles = new Array<TiledMapTile>();
 	
 	// GDX GUI
@@ -68,8 +74,10 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 	private float minZoom = 0.5f;
 	private float zoomStep = 0.01f;
 	private Skin skin;
+	//private FitViewport viewport;
 	
-	FitViewport viewport;
+	boolean modo_mover = false;
+	
 	
 	@Override
 	public void create () {
@@ -80,11 +88,15 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 		
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
-		camera = new OrthographicCamera();
-		camera.setToOrtho(false, (w / h) * 10, 10);
-		camera.zoom = currentZoom;
+		mapCamera = new OrthographicCamera((w / h) * 10, 10);
+		mapCamera.zoom = currentZoom;
+		mapCamera.update();
+		mapViewport = new FitViewport((w/h)*10, 10, mapCamera);
+		
+		camera = new OrthographicCamera((w / h) * 10, 10);
+		camera.zoom = 2322;
 		camera.update();
-		viewport = new FitViewport((w/h)*10, 10, camera);
+		//viewport = new FitViewport((w/h)*10, 10, camera);
 
 		font = new BitmapFont();
 		batch = new SpriteBatch();
@@ -99,6 +111,7 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 		slider = new Slider(minZoom, maxZoom, zoomStep, false, skin);
 		stage.addActor(slider);
 		slider.setValue(currentZoom);
+		slider.setPosition(72f, 6f);
 		
 		shaperenderer = new ShapeRenderer();
 
@@ -118,48 +131,34 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 			Sprite sp = new Sprite();
 			sp.setPosition(0, 0);
 			sp.setRegion(tr);
-			sp.setRegionWidth(32);
-			sp.setRegionHeight(32);
 			
 			this.edittiles.add(tmt);
-			//this.editsprites.add(sp);
 			this.editsprites.add(tr);
+			//this.editsprites.add(tr);
 			
 		}
-		camera.position.x = camera.position.x - 4f;
-		camera.position.y = camera.position.y - 1f;
+		mapCamera.position.x = mapCamera.position.x - 4f;
+		mapCamera.position.y = mapCamera.position.y - 1f;
 		
 		slider.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor)
 			{
-				camera.zoom = slider.getValue();
+				mapCamera.zoom = slider.getValue();
 			}
 		});
 	}
 
-	void update()
-	{
-		
-	}
-
-
-	void DrawAvailableTiles()
-	{
-		for( int i = 0; i < editsprites.size-1; i++ )
-		{
-			batch.draw(editsprites.get(i), 0, 0);
-			//editsprites.get(i).draw(batch);
-			//batch.draw(editsprites.get(i), i*64f, 0f);
-		}
-	}
-
 	public void resize (int width, int height) {
-	    viewport.update(width, height, true);
+	    mapViewport.update(width, height, true);
 	    stage.getViewport().update(width, height, true);
-	    camera.setToOrtho(false, 10f*((float)width)/((float)height), 10f);
-	    camera.position.x = 3.5f;
-	    camera.position.y = 3.5f;
+	    mapCamera.setToOrtho(false, 10f*((float)width)/((float)height), 10f);
+	    mapCamera.position.x = 3.5f;
+	    mapCamera.position.y = 3.5f;
+	    
+	    //viewport.update(width, height, true);
+	    //camera.setToOrtho(false, 10f*((float)width)/((float)height), 10f);
+
 	}
 
 	SpriteBatch batch2;
@@ -169,50 +168,41 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 		Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		batch.setProjectionMatrix(camera.projection);
-		batch.setTransformMatrix(camera.view);
-
-		batch.begin();
 		stage.act(Gdx.graphics.getDeltaTime());
-		camera.update();
+		mapCamera.update();
 
-		renderer.setView(camera);
+		renderer.setView(mapCamera);
 		renderer.render();
-		font.draw(batch, "SAMPLE TILESET BY NOSGHY", 10, 20);
-		//batch.end();		
-		//batch.begin();
-		//camera.update();
-		DrawAvailableTiles();
 
-		batch.end();
-
+		//batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 		stage.draw();
 		batch.end();
-		
+
+		batch.begin();
+		for( int i = 0; i < editsprites.size-1; i++ )
+		{
+			//editsprites.get(i).scale((float) 0.00000001);
+			//batch.draw(editsprites.get(i), Gdx.graphics.getWidth() - 64f, i*64f);
+			batch.draw(editsprites.get(i), 0f, i*64f);
+			//editsprites.get(i).draw(batch);
+			//batch.draw(editsprites.get(i), i*64f, 0f);
+		}
+		batch.end();
+
 	}
 
 	@Override
 	public boolean keyDown(int keycode) {
-		if( keycode == Keys.W ) camera.position.y -= 1;
-		if( keycode == Keys.S ) camera.position.y += 1;
-		if( keycode == Keys.A ) camera.position.x += 1;
-		if( keycode == Keys.D ) camera.position.x -= 1;
+		if( keycode == Keys.W ) mapCamera.position.y -= 1;
+		if( keycode == Keys.S ) mapCamera.position.y += 1;
+		if( keycode == Keys.A ) mapCamera.position.x += 1;
+		if( keycode == Keys.D ) mapCamera.position.x -= 1;
+		if( keycode == Keys.SPACE ) this.modo_mover = !this.modo_mover;
 		
 		return false;
 	}
 
-	@Override
-	public boolean keyUp(int keycode) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean keyTyped(char character) {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
 	private boolean IsValidTile( Vector3 tile )
 	{
@@ -227,12 +217,18 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 
 	int CheckClickInPalette( float x, float y )
 	{
+		int nt = editsprites.size;
 		for( int i = 0; i < editsprites.size; i++ )
 		{
-			bb.min.x = i * 64f;
-			bb.min.y = 0f;
-			bb.max.x = (i+1) * 64f;
-			bb.max.y = 64f;
+			bb.min.x = 0f;
+			bb.min.y = (nt-i-2) * 64f;
+			//Vector3 umin = mapCamera.unproject(bb.min);
+			
+			bb.max.x = 64f;
+			bb.max.y = (nt-i+1-2) * 64f;
+			//Vector3 umax = mapCamera.unproject(bb.max);
+			
+			//bb.set(umin, umax);
 
 			testPoint.x = x;
 			testPoint.y = y;
@@ -243,11 +239,14 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 	
 	int selectedTileIndex = 0;
 	int prevx, prevy;
-	
+
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 		prevx = screenX;
 		prevy = screenY;
+
+		if( modo_mover == false)
+		{
 		System.out.println("screenXY: " + screenX + ", " + screenY);
 		int justSelectedTileIndex = CheckClickInPalette(screenX, screenY);
 
@@ -257,7 +256,7 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 		}
 
 		// get world coordinates
-		Vector3 clickPos = camera.unproject(new Vector3( screenX, screenY, 0f));
+		Vector3 clickPos = mapCamera.unproject(new Vector3( screenX, screenY, 0f));
 		
 		// tilemap is at 0, round to get tile pos
 		clickPos.x = (float) Math.floor(clickPos.x);
@@ -271,7 +270,7 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 			c.setTile(edittiles.get(selectedTileIndex));
 			System.out.println(ml.getCell(((int)clickPos.x), ((int)clickPos.y)).getTile().getId());
 		}
-
+		}
 		return false;
 	}
 
@@ -282,18 +281,37 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 	}	
 	
 	float speed = 0.01f;
+	boolean startNoMove = false;
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		if( this.modo_mover == true )
+		{
 		int dx = prevx - screenX;
 		int dy = prevy - screenY;
 		prevx = screenX;
 		prevy = screenY;
-		camera.position.x += dx * speed * currentZoom;
-		camera.position.y -= dy * speed * currentZoom;
+		mapCamera.position.x += dx * speed * currentZoom;
+		mapCamera.position.y -= dy * speed * currentZoom;
 		System.out.println(dx);
+		}
+		startNoMove = true;
+		touchDown(screenX, screenY, pointer, 0);
+
 		return false;
 	}
 
+	@Override
+	public boolean keyUp(int keycode) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean keyTyped(char character) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
 	@Override
 	public boolean mouseMoved(int screenX, int screenY) {
 		// TODO Auto-generated method stub
