@@ -29,11 +29,23 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.List;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
@@ -55,11 +67,15 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 	Array<TextureRegion> editsprites = new Array<TextureRegion>();
 	//Array<Sprite> editsprites = new Array<Sprite>();
 	Array<TiledMapTile> edittiles = new Array<TiledMapTile>();
+	Array<ImageButton> uimages = new Array<ImageButton>();
+	
 	
 	// GDX GUI
 	private Stage stage;
 	private Slider slider;
+	private TextButton textButton;
 	private ShapeRenderer shaperenderer;
+	private ScrollPane scrollPane;
 	
 	InputMultiplexer imux;
 	
@@ -109,10 +125,13 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 		
 		skin = new Skin(Gdx.files.internal("uiskin.json"));
 		slider = new Slider(minZoom, maxZoom, zoomStep, false, skin);
+		textButton = new TextButton("edit", skin, "toggle");
 		stage.addActor(slider);
+		stage.addActor(textButton);
 		slider.setValue(currentZoom);
 		slider.setPosition(72f, 6f);
-		
+		textButton.setWidth(60);
+
 		shaperenderer = new ShapeRenderer();
 
 		// map
@@ -124,6 +143,9 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 		map = assetManager.get("maps/map0.tmx");
 		renderer = new OrthogonalTiledMapRenderer(map, mapUnitScale);
 
+		Table t = new Table();
+		
+		int i = 0;
 		for( TiledMapTile tmt : map.getTileSets().getTileSet(0) )
 		{
 			TextureRegion tr = tmt.getTextureRegion();
@@ -131,12 +153,43 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 			Sprite sp = new Sprite();
 			sp.setPosition(0, 0);
 			sp.setRegion(tr);
+			ImageButtonStyle ims = new ImageButtonStyle();
 			
+			ims.imageUp = new TextureRegionDrawable(tr);
+			ims.imageDown = new TextureRegionDrawable(tr);
+			
+			ImageButton img = new ImageButton(ims);
+			uimages.add(img);
+			img.setPosition(0, i*64);
+			img.setUserObject(((Integer)i));
+			img.addListener(new ClickListener(){
+				@Override
+				public void clicked(InputEvent event, float x, float y)
+				{
+					int val = ((Integer)event.getListenerActor().getUserObject());
+					selectedTileIndex = val;
+				}
+			});
+			t.row();
+			t.add(img).padLeft(0);
+			//stage.addActor(img);
+			i++;
+
 			this.edittiles.add(tmt);
 			this.editsprites.add(tr);
 			//this.editsprites.add(tr);
 			
 		}
+		//l.setItems(uimages);
+		t.left();
+		t.setPosition(0f, 0f);
+		t.setFillParent(true);
+		t.setWidth(uimages.get(0).getWidth());
+		scrollPane = new ScrollPane(t);
+		scrollPane.setPosition(0f, 0f);
+		scrollPane.setHeight(Gdx.graphics.getHeight());
+		scrollPane.setWidth(uimages.get(0).getWidth());
+		stage.addActor(scrollPane);
 		mapCamera.position.x = mapCamera.position.x - 4f;
 		mapCamera.position.y = mapCamera.position.y - 1f;
 		
@@ -145,6 +198,20 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 			public void changed(ChangeEvent event, Actor actor)
 			{
 				mapCamera.zoom = slider.getValue();
+			}
+		});
+		slider.setPosition(Gdx.graphics.getWidth() - slider.getWidth() - 6f, 6f);
+		textButton.setPosition(Gdx.graphics.getWidth() - textButton.getWidth() - 6f, 32f);
+
+		textButton.addListener(new ClickListener()
+		{
+			@Override
+			public void clicked(InputEvent event, float x, float y)
+			{
+				modo_mover = !modo_mover;
+				if( modo_mover ) textButton.setText("move");
+				else textButton.setText("edit");
+				
 			}
 		});
 	}
@@ -175,19 +242,20 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 		renderer.render();
 
 		//batch.setProjectionMatrix(camera.combined);
-		batch.begin();
-		stage.draw();
-		batch.end();
 
 		batch.begin();
 		for( int i = 0; i < editsprites.size-1; i++ )
 		{
 			//editsprites.get(i).scale((float) 0.00000001);
 			//batch.draw(editsprites.get(i), Gdx.graphics.getWidth() - 64f, i*64f);
-			batch.draw(editsprites.get(i), 0f, i*64f);
+			//batch.draw(editsprites.get(i), 0f, i*64f);
 			//editsprites.get(i).draw(batch);
 			//batch.draw(editsprites.get(i), i*64f, 0f);
 		}
+		batch.end();
+		
+		batch.begin();
+		stage.draw();
 		batch.end();
 
 	}
