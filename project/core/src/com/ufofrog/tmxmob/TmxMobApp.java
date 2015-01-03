@@ -96,6 +96,7 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 	//private FitViewport viewport;
 	
 	boolean modo_mover = false;
+	private float stageZoom = 500;
 	
 	
 	@Override
@@ -126,7 +127,7 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 		
 		imux = new InputMultiplexer();
 		stage = new Stage( new StretchViewport(w, h) );
-		stage.getViewport().setWorldSize(450,h/w*450);
+		stage.getViewport().setWorldSize(stageZoom ,h/w*stageZoom);
 		imux.addProcessor(stage);
 		imux.addProcessor(this);
 
