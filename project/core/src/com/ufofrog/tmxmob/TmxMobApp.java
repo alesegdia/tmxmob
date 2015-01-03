@@ -1,5 +1,12 @@
 package com.ufofrog.tmxmob;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+
+import net.dermetfan.gdx.maps.tiled.TmxMapWriter;
+import net.dermetfan.gdx.maps.tiled.TmxMapWriter.Format;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -96,14 +103,14 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 	//private FitViewport viewport;
 	
 	boolean modo_mover = false;
-	private float stageZoom = 500;
+	private float stageZoom = 600;
 	
+	TmxMapWriter tmxwritter;
 	
 	@Override
 	public void create () {
 		
 		batch2 = new SpriteBatch();
-		
 		Gdx.input.setInputProcessor(this);
 		
 		float w = Gdx.graphics.getWidth();
@@ -245,6 +252,18 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 				
 			}
 		});
+
+		FileWriter fw;
+		try {
+			fw = new FileWriter("asd.tmx");
+			tmxwritter = new TmxMapWriter(fw);
+			tmxwritter.tmx(map, Format.Base64);
+			fw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 	public void resize (int width, int height) {
