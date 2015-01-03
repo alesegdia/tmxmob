@@ -35,6 +35,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -74,8 +75,10 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 	private Stage stage;
 	private Slider slider;
 	private TextButton textButton;
+	private TextButton savebut;
 	private ShapeRenderer shaperenderer;
 	private ScrollPane scrollPane;
+	private OrthographicCamera stagecam;
 	
 	InputMultiplexer imux;
 	
@@ -109,25 +112,35 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 		mapCamera.update();
 		mapViewport = new FitViewport((w/h)*10, 10, mapCamera);
 		
+		stagecam = new OrthographicCamera((w / h) * 10, 10);
+		stagecam.update();
+		
 		camera = new OrthographicCamera((w / h) * 10, 10);
 		camera.zoom = 2322;
 		camera.update();
 		//viewport = new FitViewport((w/h)*10, 10, camera);
 
 		font = new BitmapFont();
+		font.setScale(0.05f);
 		batch = new SpriteBatch();
 		
 		imux = new InputMultiplexer();
-		stage = new Stage();
-		imux.addProcessor(this);
+		stage = new Stage( new StretchViewport(w, h) );
+		
 		imux.addProcessor(stage);
+		imux.addProcessor(this);
+
 		Gdx.input.setInputProcessor(imux);
 		
 		skin = new Skin(Gdx.files.internal("uiskin.json"));
 		slider = new Slider(minZoom, maxZoom, zoomStep, false, skin);
 		textButton = new TextButton("edit", skin, "toggle");
+		savebut = new TextButton("save", skin);
 		stage.addActor(slider);
 		stage.addActor(textButton);
+		stage.addActor(savebut);
+		savebut.setPosition(200f,200f);
+		
 		slider.setValue(currentZoom);
 		slider.setPosition(72f, 6f);
 		textButton.setWidth(60);
@@ -185,6 +198,10 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 		t.setPosition(0f, 0f);
 		t.setFillParent(true);
 		t.setWidth(uimages.get(0).getWidth());
+		Label label = new Label("", skin);
+		label.setText("sample tileset by Nosghy");
+		label.setPosition(72f, 10f);
+		stage.addActor(label);
 		scrollPane = new ScrollPane(t);
 		scrollPane.setPosition(0f, 0f);
 		scrollPane.setHeight(Gdx.graphics.getHeight());
@@ -204,6 +221,17 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 		textButton.setPosition(Gdx.graphics.getWidth() - textButton.getWidth() - 6f, 32f);
 
 		textButton.addListener(new ClickListener()
+		{
+			@Override
+			public void clicked(InputEvent event, float x, float y)
+			{
+				modo_mover = !modo_mover;
+				if( modo_mover ) textButton.setText("move");
+				else textButton.setText("edit");
+				
+			}
+		});
+		savebut.addListener(new ClickListener()
 		{
 			@Override
 			public void clicked(InputEvent event, float x, float y)
@@ -346,21 +374,22 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
 		// TODO Auto-generated method stub
 		return false;
-	}	
-	
+	}
+
 	float speed = 0.01f;
 	boolean startNoMove = false;
+
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
 		if( this.modo_mover == true )
 		{
-		int dx = prevx - screenX;
-		int dy = prevy - screenY;
-		prevx = screenX;
-		prevy = screenY;
-		mapCamera.position.x += dx * speed * currentZoom;
-		mapCamera.position.y -= dy * speed * currentZoom;
-		System.out.println(dx);
+			int dx = prevx - screenX;
+			int dy = prevy - screenY;
+			prevx = screenX;
+			prevy = screenY;
+			mapCamera.position.x += dx * speed * currentZoom;
+			mapCamera.position.y -= dy * speed * currentZoom;
+			System.out.println(dx);
 		}
 		startNoMove = true;
 		touchDown(screenX, screenY, pointer, 0);
