@@ -126,7 +126,7 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 		
 		imux = new InputMultiplexer();
 		stage = new Stage( new StretchViewport(w, h) );
-		
+		stage.getViewport().setWorldSize(450,h/w*450);
 		imux.addProcessor(stage);
 		imux.addProcessor(this);
 
@@ -183,8 +183,9 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 					selectedTileIndex = val;
 				}
 			});
+			t.add(img).padLeft(0).pad(0).bottom();
 			t.row();
-			t.add(img).padLeft(0);
+
 			//stage.addActor(img);
 			i++;
 
@@ -204,7 +205,7 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 		stage.addActor(label);
 		scrollPane = new ScrollPane(t);
 		scrollPane.setPosition(0f, 0f);
-		scrollPane.setHeight(Gdx.graphics.getHeight());
+		scrollPane.setHeight(stage.getViewport().getWorldHeight());
 		scrollPane.setWidth(uimages.get(0).getWidth());
 		stage.addActor(scrollPane);
 		mapCamera.position.x = mapCamera.position.x - 4f;
@@ -217,8 +218,9 @@ public class TmxMobApp extends ApplicationAdapter implements InputProcessor {
 				mapCamera.zoom = slider.getValue();
 			}
 		});
-		slider.setPosition(Gdx.graphics.getWidth() - slider.getWidth() - 6f, 6f);
-		textButton.setPosition(Gdx.graphics.getWidth() - textButton.getWidth() - 6f, 32f);
+		//slider.setPosition(Gdx.graphics.getWidth() - slider.getWidth() - 6f, 6f);
+		slider.setPosition(stage.getViewport().getWorldWidth() - slider.getWidth() - 6f, 6f);
+		textButton.setPosition(stage.getViewport().getWorldWidth() - textButton.getWidth() - 6f, 32f);
 
 		textButton.addListener(new ClickListener()
 		{
