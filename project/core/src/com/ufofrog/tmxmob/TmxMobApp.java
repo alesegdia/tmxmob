@@ -11,6 +11,7 @@ public class TmxMobApp extends GameApp {
 	EditScreen editScreen;
 	NewMapScreen newMapScreen;
 	SaveScreen saveScreen;
+	LoadScreen loadScreen;
 	
 	public TmxMobApp(ActionResolver actionResolver) {
 		super(actionResolver);
@@ -22,6 +23,7 @@ public class TmxMobApp extends GameApp {
 		editScreen = new EditScreen(this);
 		newMapScreen = new NewMapScreen(this);
 		saveScreen = new SaveScreen(this);
+		loadScreen = new LoadScreen(this);
 		this.setScreen(this.editScreen);
 	}
 

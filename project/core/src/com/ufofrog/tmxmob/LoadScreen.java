@@ -1,12 +1,5 @@
 package com.ufofrog.tmxmob;
 
-import java.io.FileWriter;
-import java.io.IOException;
-
-import net.dermetfan.gdx.maps.tiled.TmxMapWriter;
-import net.dermetfan.gdx.maps.tiled.TmxMapWriter.Format;
-
-import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.files.FileHandle;
@@ -17,25 +10,20 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Array;
 import com.ufofrog.core.GameScreen;
 
-public class NewMapScreen extends GameScreen<TmxMobApp> implements InputProcessor, GestureListener {
+public class LoadScreen extends GameScreen<TmxMobApp> implements InputProcessor, GestureListener {
 
 	Stage stage;
 	private Skin skin;
 	private SpriteBatch batch;
-	Array<FileHandle> tmxfiles = new Array<FileHandle>();
-	Array<FileHandle> imgfiles = new Array<FileHandle>();
 
-	public NewMapScreen(TmxMobApp game) {
+	public LoadScreen(TmxMobApp game) {
 		super(game);
 		skin = new Skin(Gdx.files.internal("uiskin.json"));
 
@@ -43,92 +31,45 @@ public class NewMapScreen extends GameScreen<TmxMobApp> implements InputProcesso
 		stage = new Stage();
 		
 		// CREATE LABELS AND TEXTS
-	    Label twLabel = new Label("Tile width: ", skin);
-	    TextField twText = new TextField("32", skin);
-	    Label thLabel = new Label("Tile height: ", skin);
-	    TextField thText = new TextField("32", skin);
-	    Label mwLabel = new Label("Map height: ", skin);
-	    TextField mwText = new TextField("32", skin);
-	    Label mhLabel = new Label("Map height: ", skin);
-	    TextField mhText = new TextField("32", skin);
+	    Label twLabel = new Label("Source", skin);
 
-	    // CREATE AVAILABLE IMAGE LIST
-	    RefreshFiles();
-	    SelectBox<FileHandle> list = new SelectBox<FileHandle>(skin);
-	    list.setItems(imgfiles);
-
+	    final SelectBox<FileHandle> list = new SelectBox<FileHandle>(skin);
+	    game.newMapScreen.RefreshFiles();
+	    list.setItems(game.newMapScreen.tmxfiles);
+	    
 	    final TmxMobApp thegame = this.game;
 
-	    // CREATE "CREATE" BUTTON
-	    TextButton createButton = new TextButton("Create!", skin);
-		createButton.addListener(new ClickListener() {
+	    // CREATE "LOAD" BUTTON
+	    TextButton loadButton = new TextButton("Load!", skin);
+	    loadButton.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y)
 			{
-				// create new game here with parameters
+				thegame.editScreen.LoadFile(list.getSelected().name());					
 				thegame.setScreen(thegame.editScreen);
 			}
 	    });
-
 		//stage.addActor(createButton);
 
 	    // DISPLAY GUI
 	    Table table = new Table();
-	    table.add(twLabel);              // Row 0, column 0.
-	    table.add(twText).width(100).space(10);    // Row 0, column 1.
-	    table.row();                       // Move to next row.
-	    table.add(thLabel);           // Row 1, column 0.
-	    table.add(thText).width(100).space(10); // Row 1, column 1.
-	    table.row();                       // Move to next row.
-	    table.add(mwLabel);           // Row 1, column 0.
-	    table.add(mwText).width(100).space(10); // Row 1, column 1.
-	    table.row();                       // Move to next row.
-	    table.add(mhLabel);           // Row 1, column 0.
-	    table.add(mhText).width(100).space(10); // Row 1, column 1.
+	    table.add(twLabel).space(10).center();
 	    table.row();
-	    table.add(list).colspan(2).space(10);
+	    table.add(list).space(10).center();
 	    table.row();
-	    table.add(createButton).colspan(2);
+	    table.add(loadButton).center();
 	    stage.addActor(table);
 	    table.setFillParent(true);
 
 	}
 
-	void RefreshFiles()
-	{
-		imgfiles.clear();
-		tmxfiles.clear();
-	    FileHandle dirHandle;
-		if (Gdx.app.getType() == ApplicationType.Android) {
-			dirHandle = Gdx.files.internal(".");
-		} else {
-			// ApplicationType.Desktop ..
-			dirHandle = Gdx.files.internal(".");
-		}
-	    for (FileHandle entry: dirHandle.list()) {
-	    	if( ExtensionEquals(entry,"jpg") || ExtensionEquals(entry,"png") )
-	    	{
-		    	System.out.println("IMAGE: " + entry);
-		    	imgfiles.add(entry);
-	    	}
-	    	else if( ExtensionEquals(entry,"tmx") )
-	    	{
-		    	System.out.println("TILED: " + entry);
-	    		tmxfiles.add(entry);
-	    	}
-	    }
-	}
-	
-	private boolean ExtensionEquals( FileHandle fh, String ext )
-	{
-		return fh.extension().compareToIgnoreCase(ext) == 0;
-	}
 	
 	@Override
 	public void Reset()
 	{
 		Gdx.input.setInputProcessor(stage);
-		RefreshFiles();
+	    game.newMapScreen.RefreshFiles();
+
 	}
 	
 	@Override

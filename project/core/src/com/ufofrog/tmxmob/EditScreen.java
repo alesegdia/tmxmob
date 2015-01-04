@@ -59,6 +59,8 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 	private TextButton editMoveButton;
 	private TextButton saveButton;
 	private TextButton newButton;
+	private TextButton loadButton;
+	
 	private ScrollPane tilePaletteScrollPane;
 	private Skin skin;
 	private float stageZoom = 600;
@@ -84,6 +86,18 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 	boolean moveMode = false;
 
 
+	public void LoadFile(String mapfile)
+	{
+		assetManager = new AssetManager();
+		assetManager.setLoader(TiledMap.class, new TmxMapLoader(
+				new InternalFileHandleResolver()));
+		assetManager.load(mapfile, TiledMap.class);
+		assetManager.finishLoading(); 
+		currentMap = assetManager.get(mapfile);
+		mapRenderer = new OrthogonalTiledMapRenderer(currentMap, camUnitScale);
+
+	}
+	
 	@Override
 	public void Reset()
 	{
@@ -138,13 +152,26 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 				thegame.setScreen(thegame.newMapScreen);
 			}
 		});
+		
+		loadButton = new TextButton("LOAD", skin);
+		loadButton.addListener(new ClickListener()
+		{
+			@Override
+			public void clicked(InputEvent event, float x, float y)
+			{
+				thegame.setScreen(thegame.loadScreen);
+			}
+		});
+
 
 		stage.addActor(mapZoomSlider);
 		stage.addActor(editMoveButton);
 		stage.addActor(saveButton);
 		stage.addActor(newButton);
+		stage.addActor(loadButton);
 		saveButton.setPosition(stage.getViewport().getWorldWidth() - saveButton.getWidth() - 6f,stage.getViewport().getWorldHeight() - saveButton.getHeight()-6f);
 		newButton.setPosition(stage.getViewport().getWorldWidth() - newButton.getWidth() - 6f,stage.getViewport().getWorldHeight() - newButton.getHeight() - 12f - saveButton.getHeight());
+		loadButton.setPosition(stage.getViewport().getWorldWidth() - newButton.getWidth() - 12f,stage.getViewport().getWorldHeight() - newButton.getHeight()*2 - 16f - saveButton.getHeight());
 
 		mapZoomSlider.setValue(currentZoom);
 		mapZoomSlider.setPosition(72f, 6f);
@@ -152,14 +179,7 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 
 		new ShapeRenderer();
 
-		// map
-		assetManager = new AssetManager();
-		assetManager.setLoader(TiledMap.class, new TmxMapLoader(
-				new InternalFileHandleResolver()));
-		assetManager.load("maps/map0.tmx", TiledMap.class);
-		assetManager.finishLoading(); 
-		currentMap = assetManager.get("maps/map0.tmx");
-		mapRenderer = new OrthogonalTiledMapRenderer(currentMap, camUnitScale);
+		this.LoadFile("maps/map0.tmx");
 
 		Table t = new Table();
 		
