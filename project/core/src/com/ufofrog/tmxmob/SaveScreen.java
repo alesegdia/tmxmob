@@ -27,15 +27,17 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.ufofrog.core.GameScreen;
 
-public class NewMapScreen extends GameScreen<TmxMobApp> implements InputProcessor, GestureListener {
+public class SaveScreen extends GameScreen<TmxMobApp> implements InputProcessor, GestureListener {
 
 	Stage stage;
 	private Skin skin;
 	private SpriteBatch batch;
 	Array<FileHandle> tmxfiles = new Array<FileHandle>();
 	Array<FileHandle> imgfiles = new Array<FileHandle>();
+	TmxMapWriter tmxwritter;
+	TextField tmxFileField;
 
-	public NewMapScreen(TmxMobApp game) {
+	public SaveScreen(TmxMobApp game) {
 		super(game);
 		skin = new Skin(Gdx.files.internal("uiskin.json"));
 
@@ -43,90 +45,49 @@ public class NewMapScreen extends GameScreen<TmxMobApp> implements InputProcesso
 		stage = new Stage();
 		
 		// CREATE LABELS AND TEXTS
-	    Label twLabel = new Label("Tile width: ", skin);
-	    TextField twText = new TextField("32", skin);
-	    Label thLabel = new Label("Tile height: ", skin);
-	    TextField thText = new TextField("32", skin);
-	    Label mwLabel = new Label("Map height: ", skin);
-	    TextField mwText = new TextField("32", skin);
-	    Label mhLabel = new Label("Map height: ", skin);
-	    TextField mhText = new TextField("32", skin);
-
-	    // CREATE AVAILABLE IMAGE LIST
-	    RefreshFiles();
-	    SelectBox<FileHandle> list = new SelectBox<FileHandle>(skin);
-	    list.setItems(imgfiles);
+	    Label twLabel = new Label("Destination file", skin);
+	    tmxFileField = new TextField("fistro.tmx", skin);
 
 	    final TmxMobApp thegame = this.game;
 
 	    // CREATE "CREATE" BUTTON
-	    TextButton createButton = new TextButton("Create!", skin);
-		createButton.addListener(new ClickListener() {
+	    TextButton saveButton = new TextButton("Save!", skin);
+	    saveButton.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y)
 			{
-				// create new game here with parameters
+				FileWriter fw;
+				try {
+					fw = new FileWriter(tmxFileField.getText());
+					tmxwritter = new TmxMapWriter(fw);
+					tmxwritter.tmx(thegame.editScreen.currentMap, Format.Base64);
+					fw.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				thegame.setScreen(thegame.editScreen);
 			}
 	    });
-
 		//stage.addActor(createButton);
 
 	    // DISPLAY GUI
 	    Table table = new Table();
-	    table.add(twLabel);              // Row 0, column 0.
-	    table.add(twText).width(100).space(10);    // Row 0, column 1.
-	    table.row();                       // Move to next row.
-	    table.add(thLabel);           // Row 1, column 0.
-	    table.add(thText).width(100).space(10); // Row 1, column 1.
-	    table.row();                       // Move to next row.
-	    table.add(mwLabel);           // Row 1, column 0.
-	    table.add(mwText).width(100).space(10); // Row 1, column 1.
-	    table.row();                       // Move to next row.
-	    table.add(mhLabel);           // Row 1, column 0.
-	    table.add(mhText).width(100).space(10); // Row 1, column 1.
+	    table.add(twLabel).space(10).center();
 	    table.row();
-	    table.add(list).colspan(2).space(10);
-	    table.row();
-	    table.add(createButton).colspan(2);
+	    table.add(tmxFileField).space(20).center();    // Row 0, column 1.
+	    table.row();                       // Move to next row.
+	    table.add(saveButton).center();
 	    stage.addActor(table);
 	    table.setFillParent(true);
 
 	}
 
-	void RefreshFiles()
-	{
-	    FileHandle dirHandle;
-		if (Gdx.app.getType() == ApplicationType.Android) {
-			dirHandle = Gdx.files.internal(".");
-		} else {
-			// ApplicationType.Desktop ..
-			dirHandle = Gdx.files.internal(".");
-		}
-	    for (FileHandle entry: dirHandle.list()) {
-	    	if( ExtensionEquals(entry,"jpg") || ExtensionEquals(entry,"png") )
-	    	{
-		    	System.out.println("IMAGE: " + entry);
-		    	imgfiles.add(entry);
-	    	}
-	    	else if( ExtensionEquals(entry,"tmx") )
-	    	{
-		    	System.out.println("TILED: " + entry);
-	    		tmxfiles.add(entry);
-	    	}
-	    }
-	}
-	
-	private boolean ExtensionEquals( FileHandle fh, String ext )
-	{
-		return fh.extension().compareToIgnoreCase(ext) == 0;
-	}
 	
 	@Override
 	public void Reset()
 	{
 		Gdx.input.setInputProcessor(stage);
-		RefreshFiles();
 	}
 	
 	@Override

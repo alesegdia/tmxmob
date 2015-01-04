@@ -4,11 +4,13 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.math.Vector2;
 import com.ufofrog.core.ActionResolver;
 import com.ufofrog.core.GameApp;
+import com.ufofrog.core.GameScreen;
 
 public class TmxMobApp extends GameApp {
 	
 	EditScreen editScreen;
 	NewMapScreen newMapScreen;
+	SaveScreen saveScreen;
 	
 	public TmxMobApp(ActionResolver actionResolver) {
 		super(actionResolver);
@@ -19,6 +21,7 @@ public class TmxMobApp extends GameApp {
 	public void Create () {
 		editScreen = new EditScreen(this);
 		newMapScreen = new NewMapScreen(this);
+		saveScreen = new SaveScreen(this);
 		this.setScreen(this.editScreen);
 	}
 

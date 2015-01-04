@@ -58,12 +58,13 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 	private Slider mapZoomSlider;
 	private TextButton editMoveButton;
 	private TextButton saveButton;
+	private TextButton newButton;
 	private ScrollPane tilePaletteScrollPane;
 	private Skin skin;
 	private float stageZoom = 600;
 
 	// MAP
-	private TiledMap currentMap;
+	public TiledMap currentMap;
 	private TiledMapRenderer mapRenderer;
 	private AssetManager assetManager;
 
@@ -82,7 +83,6 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 
 	boolean moveMode = false;
 
-	TmxMapWriter tmxwritter;
 
 	@Override
 	public void Reset()
@@ -114,15 +114,37 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 		imux.addProcessor(this);
 
 		Gdx.input.setInputProcessor(imux);
-		
+		final TmxMobApp thegame = this.game;
+
 		skin = new Skin(Gdx.files.internal("uiskin.json"));
 		mapZoomSlider = new Slider(minZoom, maxZoom, zoomStep, false, skin);
-		editMoveButton = new TextButton("edit", skin, "toggle");
-		saveButton = new TextButton("save", skin);
+		editMoveButton = new TextButton("EDIT", skin, "toggle");
+		saveButton = new TextButton("SAVE", skin);
+		saveButton.addListener(new ClickListener()
+		{
+			@Override
+			public void clicked(InputEvent event, float x, float y)
+			{
+				thegame.setScreen(thegame.saveScreen);
+			}
+		});
+
+		newButton = new TextButton("NEW", skin);
+		newButton.addListener(new ClickListener()
+		{
+			@Override
+			public void clicked(InputEvent event, float x, float y)
+			{
+				thegame.setScreen(thegame.newMapScreen);
+			}
+		});
+
 		stage.addActor(mapZoomSlider);
 		stage.addActor(editMoveButton);
 		stage.addActor(saveButton);
-		saveButton.setPosition(200f,200f);
+		stage.addActor(newButton);
+		saveButton.setPosition(stage.getViewport().getWorldWidth() - saveButton.getWidth() - 6f,stage.getViewport().getWorldHeight() - saveButton.getHeight()-6f);
+		newButton.setPosition(stage.getViewport().getWorldWidth() - newButton.getWidth() - 6f,stage.getViewport().getWorldHeight() - newButton.getHeight() - 12f - saveButton.getHeight());
 
 		mapZoomSlider.setValue(currentZoom);
 		mapZoomSlider.setPosition(72f, 6f);
@@ -211,31 +233,11 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 			public void clicked(InputEvent event, float x, float y)
 			{
 				moveMode = !moveMode;
-				if( moveMode ) editMoveButton.setText("move");
-				else editMoveButton.setText("edit");
+				if( moveMode ) editMoveButton.setText("MOVE");
+				else editMoveButton.setText("EDIT");
 				
 			}
 		});
-		final TmxMobApp thegame = this.game;
-		saveButton.addListener(new ClickListener()
-		{
-			@Override
-			public void clicked(InputEvent event, float x, float y)
-			{
-				thegame.setScreen(thegame.newMapScreen);
-			}
-		});
-
-		FileWriter fw;
-		try {
-			fw = new FileWriter("asd.tmx");
-			tmxwritter = new TmxMapWriter(fw);
-			tmxwritter.tmx(currentMap, Format.Base64);
-			fw.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
 	}
 	
