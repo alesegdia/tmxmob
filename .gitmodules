@@ -1,0 +1,3 @@
+[submodule "modules/libgdx-boilerplate"]
+	path = modules/libgdx-boilerplate
+	url = git@github.com:alesegdia/libgdx-boilerplate.git
