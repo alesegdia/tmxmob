@@ -8,6 +8,7 @@ import com.ufofrog.core.GameApp;
 public class TmxMobApp extends GameApp {
 	
 	EditScreen editScreen;
+	NewMapScreen newMapScreen;
 	
 	public TmxMobApp(ActionResolver actionResolver) {
 		super(actionResolver);
@@ -17,6 +18,7 @@ public class TmxMobApp extends GameApp {
 	@Override
 	public void Create () {
 		editScreen = new EditScreen(this);
+		newMapScreen = new NewMapScreen(this);
 		this.setScreen(this.editScreen);
 	}
 
