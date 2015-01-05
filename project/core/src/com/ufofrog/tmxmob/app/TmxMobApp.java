@@ -3,6 +3,7 @@ package com.ufofrog.tmxmob.app;
 import com.badlogic.gdx.math.Vector2;
 import com.ufofrog.core.ActionResolver;
 import com.ufofrog.core.GameApp;
+import com.ufofrog.tmxmob.app.config.UserConfig;
 import com.ufofrog.tmxmob.app.screen.EditScreen;
 import com.ufofrog.tmxmob.app.screen.LoadScreen;
 import com.ufofrog.tmxmob.app.screen.NewMapScreen;
@@ -14,6 +15,7 @@ public class TmxMobApp extends GameApp {
 	public NewMapScreen newMapScreen;
 	public SaveScreen saveScreen;
 	public LoadScreen loadScreen;
+	public UserConfig usercfg;
 
 	public TmxMobApp(ActionResolver actionResolver) {
 		super(actionResolver);
@@ -22,11 +24,17 @@ public class TmxMobApp extends GameApp {
 
 	@Override
 	public void Create () {
+		usercfg = new UserConfig();
+		usercfg.Defaults();
+		usercfg.LoadFromDisk();
+		usercfg.SaveToDisk();
+
 		editScreen = new EditScreen(this);
 		newMapScreen = new NewMapScreen(this);
 		saveScreen = new SaveScreen(this);
 		loadScreen = new LoadScreen(this);
 		this.setScreen(this.editScreen);
+		
 	}
 
 	@Override

@@ -42,6 +42,9 @@ public class TilePalette {
 		tableui.clearChildren();
 		tilePaletteScrollPane.setWidth(map.getTileWidth());
 		
+		tileImages.clear();
+		tiles.clear();
+		
 		// create tile ui elements
 		int i = 0;
 		for( TiledMapTile tmt : tileset )

@@ -44,6 +44,7 @@ import com.ufofrog.tmxmob.app.MapHolder;
 import com.ufofrog.tmxmob.app.TilePalette;
 import com.ufofrog.tmxmob.app.TmxMobApp;
 import com.ufofrog.tmxmob.app.config.StaticConfig;
+import com.ufofrog.tmxmob.app.config.UserConfig;
 
 public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor, GestureListener {
 	
@@ -60,7 +61,6 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 	private TextButton loadButton;
 
 	private Skin skin;
-	private float stageZoom = 500;
 
 	// CAMERA
 	private OrthographicCamera camera;
@@ -86,7 +86,7 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 	public EditScreen( TmxMobApp game )
 	{
 		super(game);
-
+		
 		// rendering stuff
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
@@ -98,7 +98,6 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 		
 		// stage config
 		stage = new Stage( new StretchViewport(w, h) );
-		stage.getViewport().setWorldSize(stageZoom ,h/w*stageZoom);
 		skin = new Skin(Gdx.files.internal("uiskin.json"));
 
 		// input config
@@ -201,8 +200,12 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 	}
 	
 	public void resize (int width, int height) {
+		float w = width;
+		float h = height;
 	    viewport.update(width, height, true);
 	    stage.getViewport().update(width, height, true);
+		int stageZoom = game.usercfg.params.stageZoom;
+		stage.getViewport().setWorldSize(stageZoom,h/w*stageZoom);
 	    camera.setToOrtho(false, 10f*((float)width)/((float)height), 10f);
 	    camera.position.x = mapHolder.getWidth()/2f;
 	    camera.position.y = mapHolder.getHeight()/2f;
