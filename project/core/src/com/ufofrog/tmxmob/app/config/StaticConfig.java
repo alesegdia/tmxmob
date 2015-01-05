@@ -1,4 +1,4 @@
-package com.ufofrog.tmxmob.app;
+package com.ufofrog.tmxmob.app.config;
 
 public class StaticConfig {
 	

@@ -35,18 +35,25 @@ public class TilePalette {
 	
 	public void loadFromMap( MapHolder map )
 	{
-		int i = 0;
+		// get tileset
 		TiledMapTileSet tileset = map.getTiledMap().getTileSets().getTileSet(0);
+		
+		// update ui elements
 		tableui.clearChildren();
 		tilePaletteScrollPane.setWidth(map.getTileWidth());
+		
+		// create tile ui elements
+		int i = 0;
 		for( TiledMapTile tmt : tileset )
 		{
+			// create ui element
 			TextureRegion tr = tmt.getTextureRegion();
 			ImageButtonStyle ims = new ImageButtonStyle();
 			ims.imageUp = new TextureRegionDrawable(tr);
 			ims.imageDown = new TextureRegionDrawable(tr);
 			ImageButton img = new ImageButton(ims);
-			tileImages.add(img);
+
+			// set props
 			img.setUserObject(((Integer)i));
 			img.addListener(new ClickListener(){
 				@Override
@@ -56,12 +63,19 @@ public class TilePalette {
 					selectedTileIndex = val;
 				}
 			});
+			
+			// positioning
 			tableui.add(img).padLeft(0).pad(0).bottom();
 			tableui.row();
+			
+			// add to lists
+			tileImages.add(img);
 			this.tiles.add(tmt);
+
 			i++;
 		}
 
+		// position table
 		tableui.left();
 		tableui.setPosition(0f, 0f);
 		tableui.setFillParent(true);

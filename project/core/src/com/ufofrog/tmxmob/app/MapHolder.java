@@ -9,6 +9,8 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Vector3;
+import com.ufofrog.tmxmob.app.config.StaticConfig;
 
 public class MapHolder {
 
@@ -69,6 +71,13 @@ public class MapHolder {
 
 	public float getTileHeight() {
 		return currentMap.getProperties().get("tileheight", Integer.class);
+	}
+
+	public boolean IsValidTile(Vector3 tile) {
+		int mapw = (Integer) getWidth();
+		int maph = (Integer) getHeight();
+		return tile.x >= 0 && tile.x < mapw &&
+			   tile.y >= 0 && tile.y < maph;
 	}
 
 	

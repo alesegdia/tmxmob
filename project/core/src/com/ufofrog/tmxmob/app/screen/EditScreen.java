@@ -41,9 +41,9 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.ufofrog.core.GameScreen;
 import com.ufofrog.tmxmob.app.MapHolder;
-import com.ufofrog.tmxmob.app.StaticConfig;
 import com.ufofrog.tmxmob.app.TilePalette;
 import com.ufofrog.tmxmob.app.TmxMobApp;
+import com.ufofrog.tmxmob.app.config.StaticConfig;
 
 public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor, GestureListener {
 	
@@ -107,18 +107,18 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 		imux.addProcessor(this);
 		Gdx.input.setInputProcessor(imux);
 		
-		// create map and tile palette
+		// TILE PALETTE *************************************************
 		tilePalette = new TilePalette();
+		tilePalette.getScrollPane().setHeight(stage.getViewport().getWorldHeight());
+		stage.addActor(tilePalette.getScrollPane());
+		// **************************************************************
+
+		// MAP HOLDER ***************************************************
 		mapHolder = new MapHolder( this.camUnitScale, tilePalette );
-		
-		// load splash map
 		mapHolder.LoadInternalFile("splash.tmx");
+		// *************************************************************
 
-		//tilePalette.loadFromMap(mapHolder);
-		//mapHolder.LoadExternalFile("maps/map0.tmx");
-
-
-		// screen buttons
+		// NEW/LOAD/SAVE BUTTONS ****************************************
 		final TmxMobApp thegame = this.game;
 		saveButton = new TextButton("SAVE", skin);
 		saveButton.addListener(new ClickListener()
@@ -147,9 +147,6 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 				thegame.setScreen(thegame.loadScreen);
 			}
 		});
-		stage.addActor(saveButton);
-		stage.addActor(newButton);
-		stage.addActor(loadButton);
 		saveButton.setPosition(
 				stage.getViewport().getWorldWidth() - saveButton.getWidth() - 6f,
 				stage.getViewport().getWorldHeight() - saveButton.getHeight() - 6f);
@@ -159,25 +156,15 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 		loadButton.setPosition(
 				stage.getViewport().getWorldWidth() - loadButton.getWidth() - 6f,
 				stage.getViewport().getWorldHeight() - newButton.getHeight() * 2 - 16f - saveButton.getHeight());
+		stage.addActor(saveButton);
+		stage.addActor(newButton);
+		stage.addActor(loadButton);
+		// *************************************************************
 
-		// zoom slider
+		// MAP ZOOM SLIDER *********************************************
 		mapZoomSlider = new Slider(minZoom, maxZoom, zoomStep, false, skin);
 		mapZoomSlider.setValue(currentZoom);
-		mapZoomSlider.setPosition(72f, 6f);
-		stage.addActor(mapZoomSlider);
-
-		// edit/move button
-		editMoveButton = new TextButton("EDIT", skin, "toggle");
-		editMoveButton.setWidth(60);
-		stage.addActor(editMoveButton);
-
-
-		tilePalette.getScrollPane().setHeight(stage.getViewport().getWorldHeight());
-		stage.addActor(tilePalette.getScrollPane());
-
-		camera.position.x = camera.position.x - 4f;
-		camera.position.y = camera.position.y - 1f;
-		
+		mapZoomSlider.setPosition(stage.getViewport().getWorldWidth() - mapZoomSlider.getWidth() - 6f, 6f);
 		mapZoomSlider.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor)
@@ -185,10 +172,13 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 				camera.zoom = mapZoomSlider.getValue();
 			}
 		});
-		//slider.setPosition(Gdx.graphics.getWidth() - slider.getWidth() - 6f, 6f);
-		mapZoomSlider.setPosition(stage.getViewport().getWorldWidth() - mapZoomSlider.getWidth() - 6f, 6f);
-		editMoveButton.setPosition(stage.getViewport().getWorldWidth() - editMoveButton.getWidth() - 6f, 32f);
+		stage.addActor(mapZoomSlider);
+		// *************************************************************
 
+		// EDIT/MOVE BUTTON ********************************************
+		editMoveButton = new TextButton("EDIT", skin, "toggle");
+		editMoveButton.setWidth(60);
+		editMoveButton.setPosition(stage.getViewport().getWorldWidth() - editMoveButton.getWidth() - 6f, 32f);
 		editMoveButton.addListener(new ClickListener()
 		{
 			@Override
@@ -200,6 +190,13 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 				
 			}
 		});
+		stage.addActor(editMoveButton);
+		// *************************************************************
+
+
+		camera.position.x = camera.position.x - 4f;
+		camera.position.y = camera.position.y - 1f;
+		
 
 	}
 	
@@ -209,10 +206,6 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 	    camera.setToOrtho(false, 10f*((float)width)/((float)height), 10f);
 	    camera.position.x = mapHolder.getWidth()/2f;
 	    camera.position.y = mapHolder.getHeight()/2f;
-	    
-	    //viewport.update(width, height, true);
-	    //camera.setToOrtho(false, 10f*((float)width)/((float)height), 10f);
-
 	}
 
 	@Override
@@ -243,13 +236,6 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 	}
 
 
-	private boolean IsValidTile( Vector3 tile )
-	{
-		int mapw = (Integer) mapHolder.getWidth();
-		int maph = (Integer) mapHolder.getHeight();
-		return tile.x >= 0 && tile.x < mapw &&
-			   tile.y >= 0 && tile.y < maph;
-	}
 	
 	int prevx, prevy;
 
@@ -268,12 +254,11 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 			clickPos.y = (float) Math.floor(clickPos.y);
 			
 			// if it's a valid tile of our map
-			if( IsValidTile( clickPos ) )
+			if( mapHolder.IsValidTile( clickPos ) )
 			{
 				TiledMapTileLayer ml = (TiledMapTileLayer) mapHolder.getTiledMap().getLayers().get(0);
 				Cell c = ml.getCell(((int)clickPos.x), ((int)clickPos.y));
 				c.setTile(tilePalette.getSelectedTile());
-				System.out.println(ml.getCell(((int)clickPos.x), ((int)clickPos.y)).getTile().getId());
 			}
 		}
 		return false;
@@ -285,7 +270,7 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 		return false;
 	}
 
-	float speed = 0.01f;
+	float movementSpeed = 0.01f;
 
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
@@ -295,8 +280,8 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 			int dy = prevy - screenY;
 			prevx = screenX;
 			prevy = screenY;
-			camera.position.x += dx * speed * currentZoom;
-			camera.position.y -= dy * speed * currentZoom;
+			camera.position.x += dx * movementSpeed * currentZoom;
+			camera.position.y -= dy * movementSpeed * currentZoom;
 			System.out.println(dx);
 		}
 		touchDown(screenX, screenY, pointer, 0);
