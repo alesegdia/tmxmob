@@ -17,11 +17,9 @@ public class MapHolder {
 	public TiledMap currentMap;
 	private TiledMapRenderer mapRenderer;
 	private AssetManager assetManager;
-	private float mapCamUnitScale;
 	private TilePalette tilePalette;
 
-	public MapHolder( float mapCamUnitScale, TilePalette tilePalette ) {
-		this.mapCamUnitScale = mapCamUnitScale;
+	public MapHolder( TilePalette tilePalette ) {
 		this.tilePalette = tilePalette;
 	}
 	

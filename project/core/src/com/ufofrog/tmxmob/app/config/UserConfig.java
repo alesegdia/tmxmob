@@ -38,7 +38,7 @@ public class UserConfig {
 			params = json.fromJson(UserConfigParams.class, fh.readString());
 		}
 	}
-	
+
 	public void SaveToDisk()
 	{
 		this.SaveToJSON(StaticConfig.JSON_CONFIG_FILEPATH);

@@ -4,47 +4,28 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.assets.loaders.resolvers.ExternalFileHandleResolver;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
-import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton.ImageButtonStyle;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.ufofrog.core.GameScreen;
 import com.ufofrog.tmxmob.app.MapHolder;
 import com.ufofrog.tmxmob.app.TilePalette;
 import com.ufofrog.tmxmob.app.TmxMobApp;
-import com.ufofrog.tmxmob.app.config.StaticConfig;
-import com.ufofrog.tmxmob.app.config.UserConfig;
 
 public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor, GestureListener {
 	
@@ -65,7 +46,6 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 	// CAMERA
 	private OrthographicCamera camera;
 	FitViewport viewport;
-	private float camUnitScale = 1f / 64f;
 	private float currentZoom = 1f;
 	private float maxZoom = 3f;
 	private float minZoom = 0.01f;
@@ -113,7 +93,7 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 		// **************************************************************
 
 		// MAP HOLDER ***************************************************
-		mapHolder = new MapHolder( this.camUnitScale, tilePalette );
+		mapHolder = new MapHolder( tilePalette );
 		mapHolder.LoadInternalFile("splash.tmx");
 		// *************************************************************
 

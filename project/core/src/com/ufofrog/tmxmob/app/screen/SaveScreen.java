@@ -1,13 +1,11 @@
 package com.ufofrog.tmxmob.app.screen;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
 import net.dermetfan.gdx.maps.tiled.TmxMapWriter;
 import net.dermetfan.gdx.maps.tiled.TmxMapWriter.Format;
 
-import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.files.FileHandle;
@@ -18,8 +16,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.List;
-import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
