@@ -1,18 +1,20 @@
-package com.ufofrog.tmxmob;
+package com.ufofrog.tmxmob.app;
 
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.math.Vector2;
 import com.ufofrog.core.ActionResolver;
 import com.ufofrog.core.GameApp;
-import com.ufofrog.core.GameScreen;
+import com.ufofrog.tmxmob.app.screen.EditScreen;
+import com.ufofrog.tmxmob.app.screen.LoadScreen;
+import com.ufofrog.tmxmob.app.screen.NewMapScreen;
+import com.ufofrog.tmxmob.app.screen.SaveScreen;
 
 public class TmxMobApp extends GameApp {
-	
-	EditScreen editScreen;
-	NewMapScreen newMapScreen;
-	SaveScreen saveScreen;
-	LoadScreen loadScreen;
-	
+
+	public EditScreen editScreen;
+	public NewMapScreen newMapScreen;
+	public SaveScreen saveScreen;
+	public LoadScreen loadScreen;
+
 	public TmxMobApp(ActionResolver actionResolver) {
 		super(actionResolver);
 		// TODO Auto-generated constructor stub

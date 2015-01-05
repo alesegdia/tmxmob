@@ -1,4 +1,4 @@
-package com.ufofrog.tmxmob;
+package com.ufofrog.tmxmob.app.screen;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -46,6 +46,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.ufofrog.core.GameScreen;
+import com.ufofrog.tmxmob.app.TmxMobApp;
 
 public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor, GestureListener {
 	

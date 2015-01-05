@@ -3,7 +3,7 @@ package com.ufofrog.tmxmob.client;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
-import com.ufofrog.tmxmob.TmxMobApp;
+import com.ufofrog.tmxmob.app.TmxMobApp;
 
 public class HtmlLauncher extends GwtApplication {
 

@@ -1,5 +1,13 @@
-package com.ufofrog.tmxmob;
+package com.ufofrog.tmxmob.app.screen;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+
+import net.dermetfan.gdx.maps.tiled.TmxMapWriter;
+import net.dermetfan.gdx.maps.tiled.TmxMapWriter.Format;
+
+import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.files.FileHandle;
@@ -10,20 +18,28 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Array;
 import com.ufofrog.core.GameScreen;
+import com.ufofrog.tmxmob.app.TmxMobApp;
 
-public class LoadScreen extends GameScreen<TmxMobApp> implements InputProcessor, GestureListener {
+public class SaveScreen extends GameScreen<TmxMobApp> implements InputProcessor, GestureListener {
 
 	Stage stage;
 	private Skin skin;
 	private SpriteBatch batch;
+	Array<FileHandle> tmxfiles = new Array<FileHandle>();
+	Array<FileHandle> imgfiles = new Array<FileHandle>();
+	TmxMapWriter tmxwritter;
+	TextField tmxFileField;
 
-	public LoadScreen(TmxMobApp game) {
+	public SaveScreen(TmxMobApp game) {
 		super(game);
 		skin = new Skin(Gdx.files.internal("uiskin.json"));
 
@@ -31,21 +47,27 @@ public class LoadScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 		stage = new Stage();
 		
 		// CREATE LABELS AND TEXTS
-	    Label twLabel = new Label("Source", skin);
+	    Label twLabel = new Label("Destination file", skin);
+	    tmxFileField = new TextField("fistro.tmx", skin);
 
-	    final SelectBox<FileHandle> list = new SelectBox<FileHandle>(skin);
-	    game.newMapScreen.RefreshFiles();
-	    list.setItems(game.newMapScreen.tmxfiles);
-	    
 	    final TmxMobApp thegame = this.game;
 
-	    // CREATE "LOAD" BUTTON
-	    TextButton loadButton = new TextButton("Load!", skin);
-	    loadButton.addListener(new ClickListener() {
+	    // CREATE "CREATE" BUTTON
+	    TextButton saveButton = new TextButton("Save!", skin);
+	    saveButton.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y)
 			{
-				thegame.editScreen.LoadFile(list.getSelected().name());					
+				try {
+					FileHandle fh = Gdx.files.external("./data/" + tmxFileField.getText());
+					Writer fw = fh.writer(false);
+					tmxwritter = new TmxMapWriter(fw);
+					tmxwritter.tmx(thegame.editScreen.currentMap, Format.Base64);
+					fw.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				thegame.setScreen(thegame.editScreen);
 			}
 	    });
@@ -55,9 +77,9 @@ public class LoadScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 	    Table table = new Table();
 	    table.add(twLabel).space(10).center();
 	    table.row();
-	    table.add(list).space(10).center();
-	    table.row();
-	    table.add(loadButton).center();
+	    table.add(tmxFileField).space(20).center();    // Row 0, column 1.
+	    table.row();                       // Move to next row.
+	    table.add(saveButton).center();
 	    stage.addActor(table);
 	    table.setFillParent(true);
 
@@ -68,8 +90,6 @@ public class LoadScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 	public void Reset()
 	{
 		Gdx.input.setInputProcessor(stage);
-	    game.newMapScreen.RefreshFiles();
-
 	}
 	
 	@Override
