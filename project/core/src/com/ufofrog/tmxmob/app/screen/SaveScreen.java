@@ -59,10 +59,10 @@ public class SaveScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 			public void clicked(InputEvent event, float x, float y)
 			{
 				try {
-					FileHandle fh = Gdx.files.external("./data/" + tmxFileField.getText());
+					FileHandle fh = Gdx.files.external("./data/tmxmob/" + tmxFileField.getText());
 					Writer fw = fh.writer(false);
 					tmxwritter = new TmxMapWriter(fw);
-					tmxwritter.tmx(thegame.editScreen.currentMap, Format.Base64);
+					tmxwritter.tmx(thegame.editScreen.mapHolder.getTiledMap(), Format.Base64);
 					fw.close();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block

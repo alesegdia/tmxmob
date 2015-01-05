@@ -101,10 +101,10 @@ public class NewMapScreen extends GameScreen<TmxMobApp> implements InputProcesso
 		tmxfiles.clear();
 	    FileHandle dirHandle;
 		if (Gdx.app.getType() == ApplicationType.Android) {
-			dirHandle = Gdx.files.external("./data/");
+			dirHandle = Gdx.files.external("./data/tmxmob");
 		} else {
 			// ApplicationType.Desktop ..
-			dirHandle = Gdx.files.external(".");
+			dirHandle = Gdx.files.external("./data/tmxmob");
 		}
 	    for (FileHandle entry: dirHandle.list()) {
 	    	if( ExtensionEquals(entry,"jpg") || ExtensionEquals(entry,"png") )
