@@ -46,11 +46,10 @@ public class LoadScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 			@Override
 			public void clicked(InputEvent event, float x, float y)
 			{
-				thegame.editScreen.mapHolder.LoadExternalFile(list.getSelected().name());					
+				thegame.mapHolder.LoadExternalFile(list.getSelected().name());					
 				thegame.setScreen(thegame.editScreen);
 			}
 	    });
-		//stage.addActor(createButton);
 
 	    // DISPLAY GUI
 	    Table table = new Table();

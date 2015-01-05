@@ -1,23 +1,39 @@
-package com.ufofrog.tmxmob.app;
+package com.ufofrog.tmxmob.map;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.assets.loaders.resolvers.ExternalFileHandleResolver;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
+import com.badlogic.gdx.maps.tiled.TiledMapTileSet;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.badlogic.gdx.math.Vector3;
+import com.ufofrog.tmxmob.app.TilePalette;
 import com.ufofrog.tmxmob.app.config.StaticConfig;
 
 public class MapHolder {
 
+	
 	public TiledMap currentMap;
 	private TiledMapRenderer mapRenderer;
 	private AssetManager assetManager;
 	private TilePalette tilePalette;
+	
+	// new map stuff
+	private Texture tilesTex;
+	TextureRegion[][] splitTiles;
 
 	public MapHolder( TilePalette tilePalette ) {
 		this.tilePalette = tilePalette;
@@ -32,6 +48,56 @@ public class MapHolder {
 		currentMap = assetManager.get(base + mapfile);
 		mapRenderer = new OrthogonalTiledMapRenderer(currentMap, 1f/this.getTileWidth());
 		tilePalette.loadFromMap(this);
+	}
+	
+	public void CreateFromScratch(MapParams params)
+	{
+		tilesTex = new Texture(params.imgfile);
+		int numTilesWidth = tilesTex.getWidth() / params.tilewidth;
+		int numTilesHeight = tilesTex.getHeight() / params.tileheight;
+
+		splitTiles = TextureRegion.split(tilesTex, params.tilewidth, params.tileheight);
+		currentMap = new TiledMap();
+		TiledMapTileLayer layer = new TiledMapTileLayer(
+				params.mapwidth, params.mapheight,
+				params.tilewidth, params.tileheight);
+		currentMap.getLayers().add(layer);
+		
+		TiledMapTileSet tileset = new TiledMapTileSet();
+		currentMap.getTileSets().addTileSet(tileset);
+		for( int i = 0; i < splitTiles.length; i++ )
+		{
+			for( int j = 0; j < splitTiles[0].length; j++ )
+			{
+				System.out.println(i+j*numTilesWidth);
+				TiledMapTile tile = new StaticTiledMapTile(splitTiles[i][j]);
+				tileset.putTile(i + j * numTilesWidth, tile);
+			}
+		}
+		
+		for( int x = 0; x < params.mapwidth; x++ )
+		{
+			for(int y = 0; y < params.mapheight; y++ )
+			{
+				Cell cell = new Cell();
+				cell.setTile(tileset.getTile(0));
+				layer.setCell(x, y, cell);
+			}
+		}
+		
+		tileset.getProperties().put("tilewidth", params.tilewidth);
+		tileset.getProperties().put("tileheight", params.tilewidth);
+		tileset.getProperties().put("name", params.imgfile.name());
+		
+
+		currentMap.getProperties().put("width", params.mapwidth);
+		currentMap.getProperties().put("height", params.mapheight);
+		currentMap.getProperties().put("tilewidth", params.tilewidth);
+		currentMap.getProperties().put("tileheight", params.tileheight);
+		
+		mapRenderer = new OrthogonalTiledMapRenderer(currentMap, 1f/this.getTileWidth());
+		tilePalette.loadFromMap(this);
+
 	}
 	
 	public void LoadInternalFile(String mapfile)

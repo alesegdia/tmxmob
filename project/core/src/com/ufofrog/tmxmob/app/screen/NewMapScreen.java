@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.ufofrog.core.GameScreen;
 import com.ufofrog.tmxmob.app.TmxMobApp;
+import com.ufofrog.tmxmob.map.MapParams;
 
 public class NewMapScreen extends GameScreen<TmxMobApp> implements InputProcessor, GestureListener {
 
@@ -28,7 +29,9 @@ public class NewMapScreen extends GameScreen<TmxMobApp> implements InputProcesso
 	private SpriteBatch batch;
 	Array<FileHandle> tmxfiles = new Array<FileHandle>();
 	Array<FileHandle> imgfiles = new Array<FileHandle>();
-
+	TextField twText, thText, mwText, mhText;
+	SelectBox<FileHandle> list;
+	
 	public NewMapScreen(TmxMobApp game) {
 		super(game);
 		skin = new Skin(Gdx.files.internal("uiskin.json"));
@@ -38,17 +41,17 @@ public class NewMapScreen extends GameScreen<TmxMobApp> implements InputProcesso
 		
 		// CREATE LABELS AND TEXTS
 	    Label twLabel = new Label("Tile width: ", skin);
-	    TextField twText = new TextField("32", skin);
+	    twText = new TextField("32", skin);
 	    Label thLabel = new Label("Tile height: ", skin);
-	    TextField thText = new TextField("32", skin);
+	    thText = new TextField("32", skin);
 	    Label mwLabel = new Label("Map height: ", skin);
-	    TextField mwText = new TextField("32", skin);
+	    mwText = new TextField("32", skin);
 	    Label mhLabel = new Label("Map height: ", skin);
-	    TextField mhText = new TextField("32", skin);
+	    mhText = new TextField("32", skin);
 
 	    // CREATE AVAILABLE IMAGE LIST
 	    RefreshFiles();
-	    SelectBox<FileHandle> list = new SelectBox<FileHandle>(skin);
+	    list = new SelectBox<FileHandle>(skin);
 	    list.setItems(imgfiles);
 
 	    final TmxMobApp thegame = this.game;
@@ -60,12 +63,19 @@ public class NewMapScreen extends GameScreen<TmxMobApp> implements InputProcesso
 			public void clicked(InputEvent event, float x, float y)
 			{
 				// create new game here with parameters
+				MapParams params = new MapParams();
+				params.tilewidth = Integer.parseInt(twText.getText());
+				params.tileheight = Integer.parseInt(thText.getText());
+				params.mapwidth = Integer.parseInt(mwText.getText());
+				params.mapheight = Integer.parseInt(mhText.getText());
+				params.imgfile = list.getSelected();
+				thegame.mapHolder.CreateFromScratch(params);
+
 				thegame.setScreen(thegame.editScreen);
 			}
 	    });
 
 		//stage.addActor(createButton);
-
 	    // DISPLAY GUI
 	    Table table = new Table();
 	    table.add(twLabel);              // Row 0, column 0.

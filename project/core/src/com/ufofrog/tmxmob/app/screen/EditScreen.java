@@ -23,9 +23,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.ufofrog.core.GameScreen;
-import com.ufofrog.tmxmob.app.MapHolder;
 import com.ufofrog.tmxmob.app.TilePalette;
 import com.ufofrog.tmxmob.app.TmxMobApp;
+import com.ufofrog.tmxmob.map.MapHolder;
 
 public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor, GestureListener {
 	
@@ -53,7 +53,6 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 
 	boolean moveMode = false;
 	
-	MapHolder mapHolder;
 	private TilePalette tilePalette;
 
 	
@@ -93,8 +92,8 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 		// **************************************************************
 
 		// MAP HOLDER ***************************************************
-		mapHolder = new MapHolder( tilePalette );
-		mapHolder.LoadInternalFile("splash.tmx");
+		game.mapHolder = new MapHolder( tilePalette );
+		game.mapHolder.LoadInternalFile("splash.tmx");
 		// *************************************************************
 
 		// NEW/LOAD/SAVE BUTTONS ****************************************
@@ -187,8 +186,8 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 		int stageZoom = game.usercfg.params.stageZoom;
 		stage.getViewport().setWorldSize(stageZoom,h/w*stageZoom);
 	    camera.setToOrtho(false, 10f*((float)width)/((float)height), 10f);
-	    camera.position.x = mapHolder.getWidth()/2f;
-	    camera.position.y = mapHolder.getHeight()/2f;
+	    camera.position.x = game.mapHolder.getWidth()/2f;
+	    camera.position.y = game.mapHolder.getHeight()/2f;
 	}
 
 	@Override
@@ -199,7 +198,7 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 		stage.act(Gdx.graphics.getDeltaTime());
 		camera.update();
 
-		mapHolder.render(camera);
+		game.mapHolder.render(camera);
 
 		batch.begin();
 		stage.draw();
@@ -237,9 +236,9 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 			clickPos.y = (float) Math.floor(clickPos.y);
 			
 			// if it's a valid tile of our map
-			if( mapHolder.IsValidTile( clickPos ) )
+			if( game.mapHolder.IsValidTile( clickPos ) )
 			{
-				TiledMapTileLayer ml = (TiledMapTileLayer) mapHolder.getTiledMap().getLayers().get(0);
+				TiledMapTileLayer ml = (TiledMapTileLayer) game.mapHolder.getTiledMap().getLayers().get(0);
 				Cell c = ml.getCell(((int)clickPos.x), ((int)clickPos.y));
 				c.setTile(tilePalette.getSelectedTile());
 			}

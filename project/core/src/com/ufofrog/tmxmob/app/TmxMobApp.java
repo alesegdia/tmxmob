@@ -8,6 +8,7 @@ import com.ufofrog.tmxmob.app.screen.EditScreen;
 import com.ufofrog.tmxmob.app.screen.LoadScreen;
 import com.ufofrog.tmxmob.app.screen.NewMapScreen;
 import com.ufofrog.tmxmob.app.screen.SaveScreen;
+import com.ufofrog.tmxmob.map.MapHolder;
 
 public class TmxMobApp extends GameApp {
 
@@ -15,7 +16,9 @@ public class TmxMobApp extends GameApp {
 	public NewMapScreen newMapScreen;
 	public SaveScreen saveScreen;
 	public LoadScreen loadScreen;
+	
 	public UserConfig usercfg;
+	public MapHolder mapHolder;
 
 	public TmxMobApp(ActionResolver actionResolver) {
 		super(actionResolver);

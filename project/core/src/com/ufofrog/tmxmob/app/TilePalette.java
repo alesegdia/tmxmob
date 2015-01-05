@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
+import com.ufofrog.tmxmob.map.MapHolder;
 
 public class TilePalette {
 	// TILE PALETTE
@@ -75,6 +76,7 @@ public class TilePalette {
 			tileImages.add(img);
 			this.tiles.add(tmt);
 
+			System.out.println(i);
 			i++;
 		}
 
