@@ -85,7 +85,9 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 		// stage config
 		stage = new Stage( new StretchViewport(w, h) );
 		skin = new Skin(Gdx.files.internal("uiskin.json"));
-
+		int stageZoom = game.usercfg.params.stageZoom;
+		stage.getViewport().setWorldSize(stageZoom ,h/w*stageZoom);
+		
 		// input config
 		imux = new InputMultiplexer();
 		imux.addProcessor(stage);
@@ -196,7 +198,7 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 		float h = height;
 	    viewport.update(width, height, true);
 	    stage.getViewport().update(width, height, true);
-		int stageZoom = game.usercfg.params.stageZoom;
+	    //int stageZoom = game.usercfg.params.stageZoom;
 		//stage.getViewport().setWorldSize(stageZoom,h/w*stageZoom);
 	    camera.setToOrtho(false, 10f*((float)width)/((float)height), 10f);
 	    camera.position.x = game.mapHolder.getWidth()/2f;
