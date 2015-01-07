@@ -29,7 +29,7 @@ public class MapHolder {
 	public TiledMap currentMap;
 	private TiledMapRenderer mapRenderer;
 	private AssetManager assetManager;
-	private TilePalette tilePalette;
+	public TilePalette tilePalette;
 	
 	// new map stuff
 	private Texture tilesTex;
@@ -43,13 +43,13 @@ public class MapHolder {
 	{
 		assetManager = new AssetManager();
 		assetManager.setLoader(TiledMap.class, new TmxMapLoader(fhr));
-		assetManager.load(base + mapfile, TiledMap.class);
+		assetManager.load(mapfile, TiledMap.class);
 		assetManager.finishLoading(); 
 		currentMap = assetManager.get(base + mapfile);
 		mapRenderer = new OrthogonalTiledMapRenderer(currentMap, 1f/this.getTileWidth());
 		tilePalette.loadFromMap(this);
 	}
-	
+
 	public void CreateFromScratch(MapParams params)
 	{
 		tilesTex = new Texture(params.imgfile);
@@ -62,39 +62,47 @@ public class MapHolder {
 				params.mapwidth, params.mapheight,
 				params.tilewidth, params.tileheight);
 		currentMap.getLayers().add(layer);
-		
+
 		TiledMapTileSet tileset = new TiledMapTileSet();
 		currentMap.getTileSets().addTileSet(tileset);
+
+		tileset.getProperties().put("imagesource", params.imgfile.name());
+		tileset.getProperties().put("imagewidth", tilesTex.getWidth());
+		tileset.getProperties().put("imageheight", tilesTex.getHeight());
+		tileset.setName("pueblopaleta1");
 		for( int i = 0; i < splitTiles.length; i++ )
 		{
 			for( int j = 0; j < splitTiles[0].length; j++ )
 			{
-				System.out.println(i+j*numTilesWidth);
+				System.out.println( i + j * numTilesWidth );
 				TiledMapTile tile = new StaticTiledMapTile(splitTiles[i][j]);
-				tileset.putTile(i + j * numTilesWidth, tile);
+				tile.setId(j + i * numTilesWidth + 1);
+				tileset.putTile(j + i * numTilesWidth + 1, tile);
 			}
 		}
 		
+		layer.setName("layer1");
 		for( int x = 0; x < params.mapwidth; x++ )
 		{
 			for(int y = 0; y < params.mapheight; y++ )
 			{
 				Cell cell = new Cell();
-				cell.setTile(tileset.getTile(0));
+				cell.setTile(tileset.getTile(1));
 				layer.setCell(x, y, cell);
 			}
 		}
-		
+
 		tileset.getProperties().put("tilewidth", params.tilewidth);
 		tileset.getProperties().put("tileheight", params.tilewidth);
 		tileset.getProperties().put("name", params.imgfile.name());
-		
 
 		currentMap.getProperties().put("width", params.mapwidth);
 		currentMap.getProperties().put("height", params.mapheight);
 		currentMap.getProperties().put("tilewidth", params.tilewidth);
 		currentMap.getProperties().put("tileheight", params.tileheight);
-		
+		tileset.getProperties().put("spacing", 0);
+		tileset.getProperties().put("margin", 0);
+
 		mapRenderer = new OrthogonalTiledMapRenderer(currentMap, 1f/this.getTileWidth());
 		tilePalette.loadFromMap(this);
 
@@ -107,7 +115,7 @@ public class MapHolder {
 	
 	public void LoadExternalFile(String mapfile)
 	{
-		LoadFile(mapfile, StaticConfig.EXTERNAL_BASE_PATH, new ExternalFileHandleResolver());
+		LoadFile(mapfile, "", new ExternalFileHandleResolver());
 	}
 
 	public TiledMap getTiledMap() {

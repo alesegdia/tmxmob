@@ -37,7 +37,6 @@ public class TmxMobApp extends GameApp {
 		saveScreen = new SaveScreen(this);
 		loadScreen = new LoadScreen(this);
 		this.setScreen(this.editScreen);
-		
 	}
 
 	@Override

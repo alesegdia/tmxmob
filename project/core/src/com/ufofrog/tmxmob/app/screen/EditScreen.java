@@ -7,6 +7,8 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
@@ -17,7 +19,9 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -54,6 +58,7 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 	boolean moveMode = false;
 	
 	private TilePalette tilePalette;
+	private ShapeRenderer shaperenderer;
 
 	
 	@Override
@@ -74,6 +79,8 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 		camera.update();
 		viewport = new FitViewport((w/h)*10, 10, camera);
 		batch = new SpriteBatch();
+		shaperenderer = new ShapeRenderer();
+		shaperenderer.setAutoShapeType(true);
 		
 		// stage config
 		stage = new Stage( new StretchViewport(w, h) );
@@ -87,14 +94,21 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 		
 		// TILE PALETTE *************************************************
 		tilePalette = new TilePalette();
-		tilePalette.getScrollPane().setHeight(stage.getViewport().getWorldHeight());
-		stage.addActor(tilePalette.getScrollPane());
-		// **************************************************************
+		//tilePalette.getScrollPane().setHeight(stage.getViewport().getWorldHeight());
+		//tilePalette.getScrollPane().setHeight(Gdx.graphics.getHeight());
 
 		// MAP HOLDER ***************************************************
+		//game.mapHolder.LoadInternalFile("maps/map0.tmx");
+		// *************************************************************
+
+		Table t = new Table();
+		tilePalette.setContainerTable(t);
 		game.mapHolder = new MapHolder( tilePalette );
 		game.mapHolder.LoadInternalFile("splash.tmx");
-		// *************************************************************
+
+		stage.addActor(t);
+		// **************************************************************
+
 
 		// NEW/LOAD/SAVE BUTTONS ****************************************
 		final TmxMobApp thegame = this.game;
@@ -174,7 +188,6 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 
 		camera.position.x = camera.position.x - 4f;
 		camera.position.y = camera.position.y - 1f;
-		
 
 	}
 	
@@ -184,10 +197,11 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 	    viewport.update(width, height, true);
 	    stage.getViewport().update(width, height, true);
 		int stageZoom = game.usercfg.params.stageZoom;
-		stage.getViewport().setWorldSize(stageZoom,h/w*stageZoom);
+		//stage.getViewport().setWorldSize(stageZoom,h/w*stageZoom);
 	    camera.setToOrtho(false, 10f*((float)width)/((float)height), 10f);
 	    camera.position.x = game.mapHolder.getWidth()/2f;
 	    camera.position.y = game.mapHolder.getHeight()/2f;
+
 	}
 
 	@Override
@@ -200,10 +214,17 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 
 		game.mapHolder.render(camera);
 
-		batch.begin();
 		stage.draw();
-		batch.end();
-
+		shaperenderer.setColor(255,0,0,255);
+		shaperenderer.begin();
+		shaperenderer.set(ShapeType.Filled);
+		game.mapHolder.tilePalette.getUITableTileContainer().drawDebug(shaperenderer);
+		game.mapHolder.tilePalette.getTable().drawDebug(shaperenderer);
+		for( Actor a : stage.getActors() )
+		{
+			if( a.getDebug() ) a.drawDebug(shaperenderer);
+		}
+		shaperenderer.end();
 	}
 
 	@Override
@@ -240,6 +261,7 @@ public class EditScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 			{
 				TiledMapTileLayer ml = (TiledMapTileLayer) game.mapHolder.getTiledMap().getLayers().get(0);
 				Cell c = ml.getCell(((int)clickPos.x), ((int)clickPos.y));
+				System.out.println(game.mapHolder.getTiledMap().getLayers().getCount());
 				c.setTile(tilePalette.getSelectedTile());
 			}
 		}

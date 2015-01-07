@@ -2,6 +2,7 @@ package com.ufofrog.tmxmob.app.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -23,6 +24,7 @@ public class LoadScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 	Stage stage;
 	private Skin skin;
 	private SpriteBatch batch;
+	SelectBox<FileHandle> fileList;
 
 	public LoadScreen(TmxMobApp game) {
 		super(game);
@@ -33,10 +35,9 @@ public class LoadScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 		
 		// CREATE LABELS AND TEXTS
 	    Label twLabel = new Label("Source", skin);
-
-	    final SelectBox<FileHandle> list = new SelectBox<FileHandle>(skin);
+	    fileList = new SelectBox<FileHandle>(skin);
 	    game.newMapScreen.RefreshFiles();
-	    list.setItems(game.newMapScreen.tmxfiles);
+	    fileList.setItems(game.newMapScreen.tmxfiles);
 	    
 	    final TmxMobApp thegame = this.game;
 
@@ -46,7 +47,8 @@ public class LoadScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 			@Override
 			public void clicked(InputEvent event, float x, float y)
 			{
-				thegame.mapHolder.LoadExternalFile(list.getSelected().name());					
+				System.out.println(fileList.getSelected().toString());
+				thegame.mapHolder.LoadExternalFile(fileList.getSelected().toString());					
 				thegame.setScreen(thegame.editScreen);
 			}
 	    });
@@ -55,7 +57,7 @@ public class LoadScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 	    Table table = new Table();
 	    table.add(twLabel).space(10).center();
 	    table.row();
-	    table.add(list).space(10).center();
+	    table.add(fileList).space(10).center();
 	    table.row();
 	    table.add(loadButton).center();
 	    stage.addActor(table);
@@ -69,7 +71,7 @@ public class LoadScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 	{
 		Gdx.input.setInputProcessor(stage);
 	    game.newMapScreen.RefreshFiles();
-
+	    fileList.setItems(game.newMapScreen.tmxfiles);
 	}
 	
 	@Override

@@ -58,7 +58,7 @@ public class SaveScreen extends GameScreen<TmxMobApp> implements InputProcessor,
 					FileHandle fh = Gdx.files.external("./data/tmxmob/" + tmxFileField.getText());
 					Writer fw = fh.writer(false);
 					tmxwritter = new TmxMapWriter(fw);
-					tmxwritter.tmx(thegame.mapHolder.getTiledMap(), Format.Base64);
+					tmxwritter.tmx(thegame.mapHolder.getTiledMap(), Format.CSV);
 					fw.close();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
